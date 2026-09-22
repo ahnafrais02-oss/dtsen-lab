@@ -1,13 +1,14 @@
 (() => {
   DTSEN.calculateWelfareScore = assignment => {
-    const a = assignment.attributes, c = DTSEN.SIMULATION_CONFIG, w = c.weights;
-    return a.income / a.householdSize / c.incomeReference * w.income +
-      ['housing', 'electricity', 'asset', 'education'].reduce((sum, key) => sum + (a[key] - 1) / 4 * w[key], 0);
+    const weights = DTSEN.SIMULATION_CONFIG.weights;
+    // Indeks 1–10; bulatkan noise floating point sebelum aturan tie-break.
+    return Math.round(Object.keys(weights).reduce((sum, key) => sum + assignment.attributes[key] * weights[key], 0) * 1000000) / 1000000;
   };
-  DTSEN.compareAssignments = (a, b) => b.welfareScore - a.welfareScore || b.attributes.income - a.attributes.income || a.id.localeCompare(b.id);
+  DTSEN.compareAssignments = (a, b) => b.welfareScore - a.welfareScore || b.attributes.expenditure - a.attributes.expenditure || a.id.localeCompare(b.id);
   DTSEN.calculateDecile = rank => {
-    if (!Number.isInteger(rank) || rank < 1 || rank > 100) throw new Error('Ranking harus 1–100.');
-    return 10 - Math.floor((rank - 1) / 10);
+    const c = DTSEN.SIMULATION_CONFIG;
+    if (!Number.isInteger(rank) || rank < 1 || rank > c.population) throw new Error(`Ranking harus 1–${c.population}.`);
+    return c.deciles - Math.floor((rank - 1) / c.perDecile);
   };
   DTSEN.calculateRanking = assignments => {
     DTSEN.validateAssignments(assignments);

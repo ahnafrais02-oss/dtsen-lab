@@ -4,13 +4,13 @@
       DTSEN.validateAssignments(population);
       const counts = Array(10).fill(0);
       population.forEach((a, i) => {
-        if (a.rank !== i + 1) throw new Error('Ranking harus unik dan berurutan 1–100.');
+        if (a.rank !== i + 1) throw new Error('Ranking harus unik dan berurutan 1–50.');
         if (!Number.isFinite(a.welfareScore) || a.welfareScore !== DTSEN.calculateWelfareScore(a)) throw new Error('Indeks tidak konsisten dengan atribut.');
         if (a.decile !== DTSEN.calculateDecile(a.rank)) throw new Error('Desil tidak konsisten dengan ranking.');
         if (i && DTSEN.compareAssignments(population[i - 1], a) > 0) throw new Error('Urutan ranking tidak konsisten.');
         counts[a.decile - 1]++;
       });
-      if (counts.some(n => n !== 10)) throw new Error('Setiap desil harus berisi tepat 10 assignment.');
+      if (counts.some(n => n !== DTSEN.SIMULATION_CONFIG.perDecile)) throw new Error('Setiap desil harus berisi tepat 5 assignment.');
     }
     if (result.before.some(a => !result.after.some(b => b.id === a.id))) throw new Error('ID populasi berubah.');
     return true;
@@ -38,36 +38,60 @@
     DTSEN.validateSimulationResult(result);
     return result;
   };
-  // Cari perubahan pendapatan dari target indeks; ranking/desil selalu dihitung engine.
-  const incomeAtScore = (item, score) => Math.max(0, Math.round(item.attributes.income +
-    (score - item.welfareScore) * item.attributes.householdSize * DTSEN.SIMULATION_CONFIG.incomeReference / DTSEN.SIMULATION_CONFIG.weights.income));
+  // Temukan perubahan atribut nyata yang memenuhi misi, bukan mengganti ranking/desil.
+  const cache = new Map();
+  const candidate = (mission, direction, ranked) => {
+    const preferred = [...ranked].sort((a, b) => Math.abs(a.rank - 28) - Math.abs(b.rank - 28));
+    for (const focus of preferred) {
+      for (let distance = 1; distance <= 9; distance++) for (const key of Object.keys(DTSEN.attributeLabels)) {
+        const value = focus.attributes[key] + direction * distance;
+        if (value < 1 || value > 10) continue;
+        const change = { id: focus.id, attributes: { [key]: value } };
+        const result = DTSEN.simulateChanges(DTSEN.assignments, [change], focus.id);
+        const f = result.comparisons.find(a => a.id === focus.id);
+        const valid = mission === 1 ? f.rankDelta !== 0 && f.decileDelta === 0 : mission === 2 ? f.decileDelta !== 0 : f.rankDelta === 0;
+        if (valid && direction * (f.newScore - f.oldScore) > 0) return { focus, change };
+      }
+    }
+    throw new Error(`Tidak ditemukan perubahan yang memenuhi misi ${mission}.`);
+  };
   DTSEN.createScenario = (mission, direction = 1) => {
     if (![1, 2, 3, 4].includes(mission) || ![-1, 0, 1].includes(direction)) throw new Error('Misi atau kondisi tidak dikenal.');
+    // Cache is keyed by data and weights so development edits never reuse stale results.
+    const cacheKey = JSON.stringify([mission, direction, DTSEN.assignments, DTSEN.SIMULATION_CONFIG]);
+    if (cache.has(cacheKey)) return DTSEN.clone(cache.get(cacheKey));
     const ranked = DTSEN.calculateRanking(DTSEN.assignments);
-    const focus = ranked[mission === 2 ? (direction > 0 ? 50 : 49) : 54];
-    let changes;
-    if (direction === 0 && mission <= 2) {
-      changes = [];
-    } else if (mission <= 2) {
-      const targetRank = focus.rank - direction * 2;
-      const others = ranked.filter(a => a.id !== focus.id);
-      const targetScore = (others[targetRank - 2].welfareScore + others[targetRank - 1].welfareScore) / 2;
-      changes = [{ id: focus.id, attributes: { income: incomeAtScore(focus, targetScore) } }];
+    let focus = ranked[27], changes = [];
+    if (mission <= 2 && direction !== 0) {
+      const found = candidate(mission, direction, ranked);
+      focus = found.focus; changes = [found.change];
     } else if (mission === 3) {
-      changes = [focus, ranked[20], ranked[35], ranked[65], ranked[78], ranked[88]].map((a, i) => ({ id: a.id,
-        attributes: { income: Math.round(a.attributes.income * (i % 2 ? 0.35 : 2.3)) } }));
-      if (direction === 0) changes = [ranked[20], ranked[35], ranked[65], ranked[78], ranked[88]].map(a => ({ id: a.id, attributes: { income: Math.round(a.attributes.income * 2.2) } }));
-      if (direction < 0) changes = changes.map(c => ({ id: c.id, attributes: { income: Math.round(ranked.find(a => a.id === c.id).attributes.income * (c.id === focus.id ? 0.7 : 1.8)) } }));
-    } else {
-      const minGap = Math.min(...ranked.slice(1).map((a, i) => ranked[i].welfareScore - a.welfareScore));
-      changes = ranked.slice(52, 58).filter(a => direction !== 0 || a.id !== focus.id).map(a => ({ id: a.id, attributes: { income: incomeAtScore(a, a.welfareScore + (direction || 1) * minGap / 4) } }));
+      const others = [ranked[10], ranked[17], ranked[32], ranked[37], ranked[42]];
+      const move = (a, step) => ({ id: a.id, attributes: Object.fromEntries(Object.entries(a.attributes).map(([key, value]) => [key, Math.max(1, Math.min(10, value + step))])) });
+      changes = others.map((a, i) => move(a, direction === 0 ? 4 : (i % 2 ? -2 : 2)));
+      if (direction !== 0) changes.unshift(move(focus, direction * 2));
+    } else if (mission === 4) {
+      if (direction !== 0) {
+        const found = candidate(4, direction, ranked);
+        focus = found.focus; changes = [found.change];
+      }
+      // Rotate five distinct profiles strictly above the focus. They exchange ranks
+      // while the count of assignments above the focus remains unchanged.
+      const group = ranked.filter(a => a.rank < focus.rank).slice(0, 5);
+      if (group.length !== 5) throw new Error('Misi 4 memerlukan lima assignment di atas fokus.');
+      group.forEach((a, i) => changes.push({ id: a.id, attributes: { ...group[(i + 1) % group.length].attributes } }));
     }
     const result = DTSEN.simulateChanges(DTSEN.assignments, changes, focus.id);
     const f = result.comparisons.find(a => a.id === focus.id);
-    const valid = direction === 0 ? !f.dataChanged && f.oldScore === f.newScore && (mission <= 2 ? result.changedAssignments.length === 0 && result.rankingChanges.length === 0 : result.changedAssignments.length >= 5 && (mission === 3 || (f.rankDelta === 0 && f.decileDelta === 0))) : mission === 1 ? result.changedAssignments.length === 1 && f.rankDelta !== 0 && f.decileDelta === 0 :
+    const focusDirectionOK = direction === 0 ? f.newScore === f.oldScore : direction * (f.newScore - f.oldScore) > 0;
+    const valid = mission <= 2 && direction === 0 ? result.changedAssignments.length === 0 && result.rankingChanges.length === 0 :
+      mission === 1 ? result.changedAssignments.length === 1 && f.rankDelta !== 0 && f.decileDelta === 0 :
       mission === 2 ? result.changedAssignments.length === 1 && f.rankDelta !== 0 && f.decileDelta !== 0 :
-      mission === 3 ? result.changedAssignments.length >= 5 : result.changedAssignments.length >= 5 && f.dataChanged && Math.abs(f.rankDelta) <= 1 && f.decileDelta === 0;
-    if (!valid) throw new Error(`Misi ${mission} tidak memenuhi tujuan edukasi.`);
-    return { mission, direction, changes, result, focus: focus.id };
+      mission === 3 ? result.changedAssignments.length >= 5 :
+      result.changedAssignments.length >= 5 && f.rankDelta === 0 && f.decileDelta === 0 && result.rankingChanges.some(a => a.id !== focus.id);
+    if (!valid || !focusDirectionOK) throw new Error(`Misi ${mission} tidak memenuhi tujuan edukasi.`);
+    const scenario = { mission, direction, changes, result, focus: focus.id };
+    cache.set(cacheKey, DTSEN.clone(scenario));
+    return scenario;
   };
 })();

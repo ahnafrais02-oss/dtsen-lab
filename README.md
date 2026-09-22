@@ -1,41 +1,30 @@
 # DTSEN Lab
 
-Simulator edukasi ranking dan desil dengan 100 assignment sintetis. Empat misi interaktif menunjukkan bagaimana perubahan data memengaruhi posisi relatif dan batas desil.
+Simulator edukasi ranking dan desil. **50 assignment sintetis, 10 desil, masing-masing 5 assignment.** Indeks simulasi kesejahteraan bukan formula resmi DTSEN.
 
-**Indeks simulasi kesejahteraan bukan formula resmi DTSEN.** Tidak menggunakan data individu nyata.
+## Menjalankan
+Buka `index.html` langsung di browser modern atau melalui Live Server. Tidak perlu npm, build, backend, atau dependensi eksternal.
 
-## Cara menjalankan
-1. Clone repository ini.
-2. Buka folder `dtsen-lab`.
-3. Buka `index.html` dengan browser modern, atau pilih **Open with Live Server** di editor.
+## Revisi 2
+- Papan ringkas: seluruh desil terlihat bersama di desktop, dengan animasi perpindahan dan fokus ★.
+- Tiga atribut berlevel 1–10: Kondisi Perumahan dan Pemenuhan Kebutuhan Dasar, Kepemilikan Aset, Pengeluaran dan/atau Pendapatan.
+- Atribut lama dan penjelasan formula di halaman dihapus.
+- Tabel detail meminta password dari dokumen revisi dan kembali terkunci setelah ditutup.
+- Misi 4 menggeser lima assignment lain sementara ranking fokus tetap.
 
-Tidak perlu npm, build, server aplikasi, atau koneksi internet.
+Password merupakan pembatas tampilan lokal untuk data sintetis, bukan perlindungan data rahasia. Aplikasi tidak mengirim password ke server.
 
-## Cara bermain dan menguji
-Pilih **Mulai Simulasi**, pilih misi, pilih kesejahteraan meningkat, menurun, atau tetap, lalu tekan **Simulasikan**. Periksa perbandingan sebelum–sesudah dan pilih **Jelaskan**. Baris assignment dapat diklik; tabel lengkap tersedia lewat **Lihat semua 100 assignment**.
+## Mencoba
+Pilih misi → pilih kesejahteraan meningkat, menurun, atau tetap → **Simulasikan**. Amati gerakan baris dan pelacak fokus. Pilih **Lihat penjelasan hasil** untuk before/after dan insight. **Perbesar papan** membantu presentasi; **Temukan fokus** membawa pengamatan kembali ke fokus.
 
-- Misi 1: ranking berubah, desil tetap.
-- Misi 2: ranking dan desil berubah; assignment lain ikut bergeser.
-- Misi 3: enam data berubah, fokus dilihat terhadap populasi.
-- Misi 4: enam data berubah, ranking dan desil fokus tetap.
+## Pengujian
+- Buka `tests/index.html`: 295 pemeriksaan mesin untuk 12 variasi, tie-break, 5 anggota/desil, immutability, dan input invalid.
+- Buka `tests/ui.html` melalui Live Server, lalu **Jalankan semua pemeriksaan UI**: 286 pemeriksaan UI untuk alur, password, tabel, reset, keyboard, dan layout 320–1280 piksel.
+- `python3 tests/check_static.py`: audit aset, path relatif, script, dan target DOM. Python hanya alat pemeriksaan.
 
-Ulangi dengan ketiga pilihan kondisi. **Ulangi dari awal** mengembalikan papan ke data awal; reload halaman menghapus progress misi.
+Lihat [PROJECT.md](PROJECT.md) untuk definisi dan hasil skenario.
 
-Buka `tests/index.html` untuk 277 pemeriksaan mesin. Tambahkan `?debug=1` ke alamat aplikasi untuk mode debug. Definisi formula, struktur file, hasil delapan variasi, dan panduan pengembangan ada di [PROJECT.md](PROJECT.md).
+## Hosting statis
+Konfigurasi `.github/workflows/pages.yml` dari tahap sebelumnya tetap tersedia. Untuk GitHub Pages, gunakan **Settings → Pages → Source: GitHub Actions**; push ke `main` memicu workflow. Untuk hosting lain, unggah `index.html`, `.nojekyll`, `css`, `js`, `data`, dan `assets` dengan struktur yang sama.
 
-## Pengujian UI
-Buka `tests/ui.html` lewat Live Server, lalu tekan **Jalankan semua pemeriksaan UI**. Tes memeriksa 12 variasi misi, animasi, urutan 100 baris, pencarian tabel, fokus keyboard, reset, serta lebar 320, 390, 768, dan 1280 piksel. Halaman tes UI perlu HTTP lokal karena menggunakan iframe; aplikasi utama tetap bisa dibuka langsung sebagai file.
-
-`python3 tests/check_static.py` memeriksa path relatif, urutan script, ID HTML, dan aset untuk deployment. Python hanya alat pemeriksaan, bukan runtime aplikasi.
-
-## Deployment GitHub Pages
-Repository: https://github.com/ahnafrais02-oss/dtsen-lab
-
-1. Di repository GitHub, buka **Settings → Pages**.
-2. Pilih **GitHub Actions** sebagai Source.
-3. Push perubahan ke branch `main`, atau jalankan **Deploy DTSEN Lab** dari tab Actions.
-4. Tunggu job deployment berhasil, lalu buka https://ahnafrais02-oss.github.io/dtsen-lab/ .
-
-Workflow tersedia di `.github/workflows/pages.yml`, dengan pemeriksaan aset sebelum publikasi. Tidak perlu npm atau build. Artifact hanya berisi file aplikasi statis. Untuk hosting statis lain, unggah `index.html`, `.nojekyll`, dan folder `css`, `js`, `data`, `assets` dengan struktur yang sama.
-
-Lihat [panduan resmi GitHub Pages](https://docs.github.com/en/get-started/start-your-journey/deploying-your-website-automatically).
+Fokus pekerjaan Revisi 2 adalah aplikasi dan pengujian; tidak melakukan push atau deployment baru.

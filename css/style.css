@@ -30,3 +30,36 @@
 @media(max-width:650px){.lab-grid{grid-template-columns:1fr}.control-panel{position:static}.population{max-height:620px;padding-right:5px}.decile-block{gap:10px}.dot{gap:5px}.row-rank{width:35px}.row-rank b{font-size:14px}.row-id{font-size:11px}.row-score{font-size:10px}.board-actions{align-items:start}.board-actions>span{max-width:150px}.board-actions button{white-space:nowrap}.focus-tracker{font-size:11px;gap:8px 12px}.focus-tracker>strong{width:100%}.population-panel{padding:15px}.compare-card{grid-template-columns:minmax(0,1fr) minmax(0,1.5fr)}.compare-values{font-size:22px}.floating-note{font-size:10px}.art-axis{font-size:8px}.board-heading h3{font-size:17px}}
 /* Native Safari popup styling can ignore padding; keep the selector touch-sized. */
 select{appearance:none;-webkit-appearance:none;min-height:48px;padding-right:34px;background-image:linear-gradient(45deg,transparent 50%,#506348 50%),linear-gradient(135deg,#506348 50%,transparent 50%);background-position:calc(100% - 17px) 50%,calc(100% - 12px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+
+/* Revisi 2: 50 assignment dalam satu papan, tanpa gulir di dalam papan desktop. */
+.playground{width:min(1360px,calc(100% - 48px));padding-top:24px}
+.play-header{margin-bottom:16px}.play-header h2{font-size:27px;margin-bottom:0}
+.lab-grid{grid-template-columns:240px minmax(0,1fr);gap:16px}
+.control-panel,.population-panel{padding:16px}.control-panel{top:12px}
+.focus-heading{margin:13px 0}.focus-heading h3{font-size:24px}
+.control-panel .small{font-size:11px;line-height:1.55}.control-panel .button{min-height:44px;padding:10px 12px}
+.focus-snapshot{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:13px 0}
+.focus-snapshot small{display:block;font-size:9px;color:var(--muted)}.focus-snapshot b{font-size:20px}
+.board-heading h3{margin-bottom:5px}.legend{margin:10px 0;gap:15px}.ranking-guide{margin:8px 0;padding:8px 10px;font-size:10px}
+.focus-tracker{padding:8px 10px;font-size:11px;gap:6px 12px}.board-actions{margin:4px 0;font-size:9px;gap:10px;flex-wrap:wrap}.board-actions .text-link{font-size:10px;min-height:32px}
+.population{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;max-height:none;overflow:visible;padding:3px;scrollbar-gutter:auto;isolation:isolate}
+.decile-block{display:block;min-width:0;padding:7px;border-radius:8px;position:relative}
+.decile-heading{display:flex;flex-direction:row;justify-content:space-between;align-items:center;gap:4px;margin-bottom:7px}
+.decile-heading strong{font-size:10px;padding:3px 5px}.decile-heading small{font-size:8px;white-space:nowrap}
+.dots{gap:5px}.dot,.dot.changed,.dot.shifted,.dot.focus{height:29px;min-height:29px;gap:3px;font-size:10px;position:relative}
+.row-rank{width:20px;font-weight:750;font-size:11px}.assignment-bar{padding:4px;gap:3px;border-radius:4px}
+.row-id{font-size:9px;font-weight:750}.row-score{font-size:8px;font-weight:500}
+.dot.focus{z-index:5}.dot.focus .assignment-bar{border:2px solid #16472f;box-shadow:0 0 0 2px #d2eaa4}
+.dot.focus .row-rank{background:#16472f;color:white}.dot.shifted:not(.focus) .assignment-bar{border:1px dashed #70438e}
+.is-animating .decile-block{border-style:dashed}.is-animating .dot:not(.focus):not(.shifted){opacity:.65}
+.board-footer{margin-top:9px;font-size:9px}.assignment-detail{padding:9px;margin-top:10px;min-height:37px;font-size:10px}
+.population-actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.population-actions .text-link{min-height:36px;font-size:11px}
+.sequence{margin:14px 0}.sequence li{padding:8px 4px;font-size:9px}
+#access-dialog{max-width:460px}#access-dialog input{max-width:none;margin-bottom:8px}#access-error{color:#9b2d20;min-height:20px;margin:4px 0 12px}
+#table-dialog th{white-space:normal;min-width:75px;vertical-align:middle}#table-dialog thead th:nth-child(2){min-width:200px}#table-dialog thead th:nth-child(4){min-width:160px}#table-dialog tbody th{position:static}
+.population-panel:fullscreen,.population-panel.board-expanded{padding:24px;background:var(--paper);overflow:auto}.population-panel:fullscreen .population{gap:16px}.population-panel:fullscreen .dot{height:clamp(35px,5vh,65px);min-height:35px}.population-panel:fullscreen .row-id{font-size:14px}.population-panel:fullscreen .row-score{font-size:12px}
+@media(max-width:1100px){.lab-grid{grid-template-columns:210px minmax(0,1fr)}.population{gap:6px}.decile-block{padding:5px}.row-score{display:none}.decile-heading small{display:none}.row-rank{width:17px}.control-panel,.population-panel{padding:12px}}
+@media(max-width:800px){.lab-grid{grid-template-columns:1fr}.control-panel{position:static;display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;align-items:center}.control-panel>.pill{grid-column:1/-1;width:fit-content}.focus-heading{margin:0}.control-panel>.small{display:none}.control-panel label{margin:0}.control-panel #direction{grid-column:2;grid-row:3}.focus-snapshot{grid-column:2;grid-row:2;padding:0}.control-panel .button{margin:0}.population{gap:8px}.row-score{display:inline}.row-id{font-size:10px}.dot,.dot.changed,.dot.shifted,.dot.focus{height:36px;min-height:36px}.row-rank{width:20px}.decile-heading small{display:inline}.playground{width:calc(100% - 28px)}}
+@media(max-width:550px){.play-header h2{font-size:23px}.population{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.decile-block{padding:8px}.dot,.dot.changed,.dot.shifted,.dot.focus{height:36px;min-height:36px}.row-id{font-size:11px}.row-score{font-size:10px}.row-rank{width:24px}.focus-tracker>strong{width:auto}.board-actions>span{max-width:none;width:100%}.board-actions button{white-space:normal}.control-panel{gap:10px}.control-panel label{font-size:10px}.focus-heading .avatar{display:none}.control-panel .pill{font-size:9px}.focus-snapshot b{font-size:17px}.focus-snapshot small{font-size:8px}.control-panel select{font-size:11px}.playground .board-footer{font-size:8px}}
+.population-panel.board-expanded{position:fixed;inset:12px;z-index:100;max-height:calc(100vh - 24px)}
+@media(min-width:551px) and (max-width:800px){.dot,.dot.changed,.dot.shifted,.dot.focus{height:32px;min-height:32px}.decile-heading{margin-bottom:5px}.decile-block{padding:5px}}
