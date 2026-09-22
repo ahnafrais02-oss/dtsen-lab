@@ -132,3 +132,5 @@ Repository tujuan: https://github.com/ahnafrais02-oss/dtsen-lab . Workflow `.git
 Aktifkan **Settings → Pages → Source: GitHub Actions**. Push ke `main` atau pemicu manual workflow menjalankan deployment. Alamat target: https://ahnafrais02-oss.github.io/dtsen-lab/ . Status aktif harus diverifikasi dari hasil deployment, bukan hanya keberadaan workflow.
 
 Panduan resmi: https://docs.github.com/en/get-started/start-your-journey/deploying-your-website-automatically .
+
+Pengujian UI pada Safari: 254 pemeriksaan awal lulus, mencakup 12 variasi, urutan papan, dialog, pencarian, fokus keyboard, reset, dan empat lebar viewport. Verifikasi visual menemukan selector native Safari terlalu pendek; styling selector kemudian diseragamkan menjadi minimum 48px dan pemeriksaan target sentuh ditambahkan.

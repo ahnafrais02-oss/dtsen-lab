@@ -62,6 +62,7 @@
         if (width <= 390) {
           assert(win.getComputedStyle($('mission-grid')).gridTemplateColumns.split(' ').length === 1, 'Kartu mobile harus satu kolom');
           assert([...doc.querySelectorAll('.dot')].every(el => el.getBoundingClientRect().height >= 44), 'Tinggi target sentuh mobile minimal 44px');
+          assert($('direction').getBoundingClientRect().height >= 44, 'Pilihan kondisi mobile minimal 44px');
         }
         log(`LULUS layout ${width}px: tanpa overflow, konten terbaca.`);
       }
