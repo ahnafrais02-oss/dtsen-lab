@@ -31,6 +31,12 @@
         assert(doc.querySelectorAll('.dot').length === 50, 'Papan harus berisi 50 assignment');
         assert([...doc.querySelectorAll('.dot')].every((el, i) => +el.dataset.rank === 50 - i), 'Papan harus berurutan ranking 50 sampai 1');
         assert(doc.querySelector('.dot.focus').dataset.id === scenario.focus, 'Fokus papan harus sesuai skenario');
+        if (mission === 1 && direction === 1) {
+          $('playground').requestFullscreen = () => Promise.reject(new Error('Test fallback'));
+          $('expand-board').click(); await delay(50);
+          assert($('playground').classList.contains('board-expanded'), 'Fallback layar penuh mencakup seluruh simulasi');
+          assert($('playground').contains($('simulate')) && $('playground').contains($('access-dialog')), 'Kontrol dan dialog berada di area yang diperbesar');
+        }
         $('simulate').click(); $('simulate').click();
         assert(win.DTSEN.game.state.busy && $('direction').disabled, 'Kontrol harus terkunci saat animasi');
         const deadline = Date.now() + 12000;
@@ -58,6 +64,11 @@
         assert($('table-body').children.length === 0 && $('table-count').textContent.includes('0 dari 50'), 'Pencarian kosong harus ditangani');
         $('table-close').click(); await delay(30); assert(!$('table-dialog').open && $('table-body').children.length === 0 && !win.DTSEN.game.state.tableUnlocked, 'Tabel harus terkunci dan dibersihkan setelah ditutup');
         assert(doc.activeElement === $('table-open'), 'Fokus keyboard harus kembali ke tombol tabel');
+        if (mission === 1 && direction === 1) {
+          assert($('playground').classList.contains('board-expanded') && !$('results').hidden, 'Simulasi selesai di tampilan diperbesar');
+          $('expand-board').click(); await delay(50);
+          assert(!$('playground').classList.contains('board-expanded') && !doc.body.classList.contains('simulation-expanded'), 'Tombol kembali memulihkan tampilan');
+        }
         log(`LULUS misi ${mission} ${direction > 0 ? 'naik' : direction < 0 ? 'turun' : 'tetap'}: ranking ${focus.oldRank} → ${focus.newRank}; desil ${focus.oldDecile} → ${focus.newDecile}.`);
       }
       assert(win.DTSEN.game.state.completed.size === 4 && $('progress-text').textContent.includes('4 dari 4'), 'Progress semua misi harus selesai');

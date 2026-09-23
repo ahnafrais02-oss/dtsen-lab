@@ -28,3 +28,12 @@ Lihat [PROJECT.md](PROJECT.md) untuk definisi dan hasil skenario.
 Konfigurasi `.github/workflows/pages.yml` dari tahap sebelumnya tetap tersedia. Untuk GitHub Pages, gunakan **Settings → Pages → Source: GitHub Actions**; push ke `main` memicu workflow. Untuk hosting lain, unggah `index.html`, `.nojekyll`, `css`, `js`, `data`, dan `assets` dengan struktur yang sama.
 
 Fokus pekerjaan Revisi 2 adalah aplikasi dan pengujian; tidak melakukan push atau deployment baru.
+
+### Revisi 3
+
+Panduan warga tersedia melalui navigasi **Panduan warga**, dengan pengantar DTSEN,
+penjelasan desil dan PMT, penyebab ketidaksesuaian data, tiga jalur pemutakhiran,
+dan catatan peran BPS. Materi diadaptasi dari dokumen Revisi 3 yang diberikan.
+Tombol **Perbesar papan** membuka seluruh ruang simulasi, termasuk pilihan kondisi,
+simulasi, reset, hasil, dan dialog detail. Jika Fullscreen API tidak tersedia,
+tampilan diperbesar memakai panel lokal; tombol Kembali atau Escape menutupnya.

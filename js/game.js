@@ -99,15 +99,38 @@
         } finally { $('population').classList.remove('is-animating'); busy(false); }
       });
       $('find-focus').addEventListener('click', () => { ui.findFocus(); const f = $('population').querySelector('.focus'); f?.focus({ preventScroll: true }); });
+      const expandedPanel = $('playground');
+      // Keep password and detail dialogs in the fullscreen subtree.
+      expandedPanel.append($('access-dialog'), $('table-dialog'));
+      const syncExpanded = () => {
+        const expanded = document.fullscreenElement === expandedPanel || expandedPanel.classList.contains('board-expanded');
+        $('expand-board').textContent = expanded ? 'Kembali ⛶' : 'Perbesar papan ⛶';
+        $('expand-board').setAttribute('aria-expanded', String(expanded));
+        document.body.classList.toggle('simulation-expanded', expanded);
+      };
+      const closeExpanded = async () => {
+        if (document.fullscreenElement === expandedPanel) await document.exitFullscreen();
+        expandedPanel.classList.remove('board-expanded'); syncExpanded();
+      };
       $('expand-board').addEventListener('click', async () => {
-        const panel = $('population-panel');
-        if (document.fullscreenElement) await document.exitFullscreen();
-        else if (panel.requestFullscreen) await panel.requestFullscreen().catch(() => panel.classList.toggle('board-expanded'));
-        else panel.classList.toggle('board-expanded');
-        $('expand-board').textContent = document.fullscreenElement || panel.classList.contains('board-expanded') ? 'Kembali ⛶' : 'Perbesar papan ⛶';
+        if (document.fullscreenElement === expandedPanel || expandedPanel.classList.contains('board-expanded')) await closeExpanded();
+        else {
+          if (expandedPanel.requestFullscreen) await expandedPanel.requestFullscreen().catch(() => expandedPanel.classList.add('board-expanded'));
+          else expandedPanel.classList.add('board-expanded');
+          expandedPanel.scrollTop = 0;
+        }
+        syncExpanded();
       });
-      document.addEventListener('keydown', event => { if (event.key === 'Escape') { $('population-panel').classList.remove('board-expanded'); if (!document.fullscreenElement) $('expand-board').textContent = 'Perbesar papan ⛶'; } });
-      document.addEventListener('fullscreenchange', () => { $('expand-board').textContent = document.fullscreenElement ? 'Kembali ⛶' : 'Perbesar papan ⛶'; });
+      expandedPanel.querySelector('.play-header a').addEventListener('click', async event => {
+        event.preventDefault(); await closeExpanded(); $('missions').scrollIntoView({ behavior: 'smooth' });
+      });
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && !$('access-dialog').open && !$('table-dialog').open) {
+          expandedPanel.classList.remove('board-expanded'); syncExpanded();
+        }
+      });
+      document.addEventListener('fullscreenchange', syncExpanded);
+      syncExpanded();
       $('population').addEventListener('click', e => { const button = e.target.closest('[data-id]'); if (button) ui.detail(state.scenario.result, button.dataset.id, state.after); });
       $('next-mission').addEventListener('click', () => select(state.scenario.mission % 4 + 1));
       $('table-open').addEventListener('click', () => {
